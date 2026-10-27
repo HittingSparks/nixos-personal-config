@@ -1,0 +1,25 @@
+{ pkgs, usuario, hostname, lib, ... }:
+{
+  imports = [ ./plasma.nix ];
+
+  home.username = usuario;
+  home.homeDirectory = "/home/${usuario}";
+  home.stateVersion = "26.05";
+
+  # Pacotes só do usuário
+  home.packages = with pkgs; [
+    kando
+    steam
+    prismlauncher
+    hyfetch
+    tailscale
+  ] ++ lib.optionals (hostname == "desktop") [
+    vesktop
+    samloader-rs
+    distrobox
+    podman
+  ];
+
+
+  programs.home-manager.enable = true;
+}
