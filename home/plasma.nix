@@ -1,5 +1,20 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, ... }:
+let
+  # ID do Kurve, deduzido do caminho do seu erro anterior (veja a nota 2)
+  kurveId = "luisbocanegra.audio.visualizer";
+
+  # Espaçador que se expande e empurra os vizinhos para os lados
+  expandingSpacer = {
+    name = "org.kde.plasma.panelspacer";
+    config.General.expanding = true;
+  };
+in
 {
+  home.packages = with pkgs; [
+    kurve
+    plasmusic-toolbar
+  ];
+
   # Script próprio: Meta+Q fecha a janela sob o ponteiro, sem mexer no foco
   xdg.dataFile."kwin/scripts/closeunderpointer/metadata.json".text = ''
     {
@@ -52,20 +67,16 @@
 
     shortcuts = {
       kwin."Close Window Under Pointer" = "Meta+Q";
-      # Meta+Q é, por padrão, o seletor de atividades; libera a tecla
       plasmashell."manage activities" = [ ];
     };
 
     configFile = {
-      # Krohnkite desligado (conflita com o HyprKwin)
       "kwinrc"."Plugins"."krohnkiteEnabled" = false;
       "kwinrc"."Plugins"."closeunderpointerEnabled" = true;
 
-      # Clique do meio na barra de título fecha a janela
       "kwinrc"."MouseBindings"."CommandActiveTitlebar2" = "Close";
       "kwinrc"."MouseBindings"."CommandInactiveTitlebar2" = "Close";
 
-      # Desativa a colagem com o botão do meio (seleção primária)
       "kwinrc"."Wayland"."EnablePrimarySelection" = false;
       "klipperrc"."General"."IgnoreSelection" = true;
 
@@ -74,15 +85,40 @@
     };
 
     panels = [
+      # Barra superior
       {
         location = "top";
         height = 40;
         widgets = [
-          "org.kde.plasma.kickoff"
-          "org.kde.plasma.icontasks"
-          "org.kde.plasma.marginsseparator"
-          "org.kde.plasma.systemtray"
-          "org.kde.plasma.digitalclock"
+          "org.kde.plasma.kickoff"          # 1. iniciador
+          "org.kde.plasma.pager"            # 2. áreas de trabalho
+          "plasmusic-toolbar"               # 3. player de música
+          expandingSpacer
+          "org.kde.plasma.digitalclock"     # 4. relógio (centro)
+          kurveId                           # 5. Kurve, ao lado do relógio
+          expandingSpacer
+          "org.kde.plasma.systemtray"       # 6. bandeja
+          "org.kde.plasma.showdesktop"      # 7. espiar o desktop (canto)
+        ];
+      }
+
+      # Dock inferior: flutuante, centralizado, esconde sozinho
+      {
+        location = "bottom";
+        height = 40;
+        floating = true;
+        hiding = "autohide";
+        alignment = "center";
+        lengthMode = "fit";
+        widgets = [
+          {
+            iconTasks.launchers = [
+              "applications:org.kde.dolphin.desktop"
+              "applications:org.kde.konsole.desktop"
+              "applications:firefox.desktop"
+              "applications:google-chrome.desktop"
+            ];
+          }
         ];
       }
     ];
