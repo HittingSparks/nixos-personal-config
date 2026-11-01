@@ -18,7 +18,6 @@
     kando
     prismlauncher
     hyfetch
-    tailscale
     cava
     kdePackages.krfb
     kdePackages.krdc
