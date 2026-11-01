@@ -44,26 +44,49 @@
     wget
     htop
     btop
+    jdk
     fastfetch
     google-chrome
     firefox
-    flatpak
     zapzap
     localsend
     pciutils
+    android-tools
+    appimage-run
     kdePackages.kpmcore
     kdePackages.isoimagewriter
+    kdePackages.qtwebsockets
+    (python3.withPackages (ps: [ ps.websockets ]))
   ];
 
   users.users.${usuario} = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" ];
+    extraGroups = [ "wheel" "networkmanager" "docker" ];
   };
 
   # Bluetooth
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
+  };
+
+  services.flatpak.enable = true;
+
+  services.tailscale = {
+    enable = true;
+    useRoutingFeatures = "client";   
+    openFirewall = true;            
+  };
+
+  # Steam
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true;
+    dedicatedServer.openFirewall = true;
+  };
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
   };
 
   networking.networkmanager.enable = true;
